@@ -38,6 +38,7 @@ INSTALL_REQUIRES = [
     "sentry-sdk~=1.0.0",
     "certifi>=2020.12.5",
     "pyserial>=3.5",
+    "pyaudio>=0.2.11",
     "pystray>=0.17",
     "tcp-latency>=0.0.10",
     "mido>=1.2.10",
