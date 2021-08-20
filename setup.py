@@ -18,7 +18,7 @@ PROJECT_DOCS = "https://ledfx.readthedocs.io"
 
 # Need to install numpy first
 SETUP_REQUIRES = [
-    "numpy>=1.20.2",
+    "numpy~=1.20.2",
     "wheel>=0.36.2",
 ]
 
@@ -38,11 +38,10 @@ INSTALL_REQUIRES = [
     "sentry-sdk~=1.0.0",
     "certifi>=2020.12.5",
     "pyserial>=3.5",
-    "pyaudio>=0.2.11",
     "pystray>=0.17",
     "tcp-latency>=0.0.10",
     "mido>=1.2.10",
-    "python-rtmidi==1.4.9.dev0",
+    "python-rtmidi==1.4.9",
     "aiohttp_cors>=0.7.0",
     "paho-mqtt>=1.5.1",
 ]
