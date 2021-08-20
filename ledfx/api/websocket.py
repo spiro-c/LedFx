@@ -246,3 +246,31 @@ class WebsocketConnection:
         _LOGGER.debug(f"Websocket unsubscribing event id {subscription_id}")
         if subscription_id in self._listeners:
             self._listeners.pop(subscription_id)()
+
+    @websocket_handler("audio_data")
+    def subscribe_event_handler(self, message):
+
+        _LOGGER.info(
+            "Websocket: {} incoming from {}".format(
+                message.get("event_type"),
+                message.get("client")
+                # message.get("data") HERE IT IS BROOOO
+            )
+        )
+        # ToDo:
+        # Remove the log on each message, and just log once
+
+        #   # create virtual audio device with:
+        #   name = f"WEB: {message.get("client")}"
+        #   data = message.get("data")
+
+    @websocket_handler("audio_data_end")
+    def unsubscribe_event_handler(self, message):
+
+        _LOGGER.info(
+            "Websocket: incoming audio from {} stopped".format(
+                message.get("client")
+            )
+        )
+        #   # remove virtual audio device with:
+        #   name = f"WEB: {message.get("client")}"
