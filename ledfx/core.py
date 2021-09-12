@@ -6,7 +6,12 @@ import warnings
 import webbrowser
 from concurrent.futures import ThreadPoolExecutor
 
-from ledfx.config import get_ssl_certs, load_config, save_config
+import fastapi
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+
+import ledfx_frontend
+from ledfx.config import load_config, save_config
 from ledfx.devices import Devices
 from ledfx.effects import Effects
 from ledfx.effects.math import interpolate_pixels
@@ -16,7 +21,6 @@ from ledfx.events import (
     LedFxShutdownEvent,
     VisualisationUpdateEvent,
 )
-from ledfx.http_manager import HttpServer
 from ledfx.integrations import Integrations
 from ledfx.presets import ledfx_presets
 from ledfx.scenes import Scenes
@@ -67,9 +71,25 @@ class LedFxCore:
         self.setup_logqueue()
         self.events = Events(self)
         self.setup_visualisation_events()
-        self.http = HttpServer(
-            ledfx=self, host=self.host, port=self.port, port_s=self.port_s
+        self.FastAPI = fastapi.FastAPI()
+        origins = ["*"]
+        self.FastAPI.add_middleware(
+            CORSMiddleware,
+            allow_origins=origins,
+            allow_credentials=True,
+            allow_methods=["*"],
+            allow_headers=["*"],
         )
+        self.FastAPI.mount(
+            "/",
+            StaticFiles(directory=ledfx_frontend.where()),
+            name="static_content",
+        )
+
+        self.host = host
+        self.port = port
+        self.port_s = port_s
+
         self.exit_code = None
 
     def dev_enabled(self):
@@ -205,7 +225,6 @@ class LedFxCore:
 
     async def async_start(self, open_ui=False):
         _LOGGER.info("Starting LedFx")
-        await self.http.start(get_ssl_certs(config_dir=self.config_dir))
         if self.icon is not None and self.icon.HAS_NOTIFICATION:
             self.icon.notify(
                 "Started in background.\nUse the tray icon to open."
@@ -267,9 +286,6 @@ class LedFxCore:
         # Fire a shutdown event and flush the loop
         self.events.fire_event(LedFxShutdownEvent())
         await asyncio.sleep(0, loop=self.loop)
-
-        _LOGGER.info("Stopping HttpServer...")
-        await self.http.stop()
 
         # Cancel all the remaining task and wait
         _LOGGER.info("Killing remaining tasks...")
