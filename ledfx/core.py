@@ -99,10 +99,12 @@ class LedFxCore:
             StaticFiles(directory=ledfx_frontend.where()),
             name="static_content",
         )
-        self.host = host
-        self.port = port
+
         self.port_s = port_s
-        uvicorn.run(self.FastAPI, host="0.0.0.0", port=8000)
+
+        uvicorn.run(
+            self.FastAPI, host=self.host, port=self.port, log_level="info"
+        )
         self.exit_code = None
 
     def dev_enabled(self):
