@@ -6,8 +6,10 @@ import warnings
 import webbrowser
 from concurrent.futures import ThreadPoolExecutor
 
-import fastapi
+import uvicorn
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
 import ledfx_frontend
@@ -77,7 +79,8 @@ class LedFxCore:
         self.setup_logqueue()
         self.events = Events(self)
         self.setup_visualisation_events()
-        self.FastAPI = fastapi.FastAPI()
+        self.FastAPI = FastAPI()
+
         origins = ["*"]
         self.FastAPI.add_middleware(
             CORSMiddleware,
@@ -86,16 +89,20 @@ class LedFxCore:
             allow_methods=["*"],
             allow_headers=["*"],
         )
+
+        @self.FastAPI.get("/", response_class=FileResponse)
+        def read_index(request: Request):
+            return FileResponse(ledfx_frontend.where() + "/index.html")
+
         self.FastAPI.mount(
             "/",
             StaticFiles(directory=ledfx_frontend.where()),
             name="static_content",
         )
-
         self.host = host
         self.port = port
         self.port_s = port_s
-
+        uvicorn.run(self.FastAPI, host="0.0.0.0", port=8000)
         self.exit_code = None
 
     def dev_enabled(self):
