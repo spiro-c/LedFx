@@ -17,8 +17,8 @@ from functools import lru_cache
 # from asyncio import coroutines, ensure_future
 from subprocess import PIPE, Popen
 
+import aiohttp
 import numpy as np
-import requests
 import voluptuous as vol
 
 _LOGGER = logging.getLogger(__name__)
@@ -238,28 +238,30 @@ class WLED:
     async def _wled_request(
         method, ip_address, endpoint, timeout=0.5, **kwargs
     ):
+        _timeout = aiohttp.ClientTimeout(sock_read=timeout)
         url = f"http://{ip_address}/{endpoint}"
 
-        try:
-            response = method(url, timeout=timeout, **kwargs)
+        async with aiohttp.request(
+            method, url, timeout=_timeout, **kwargs
+        ) as response:
+            assert response.status == 200
 
-        except requests.exceptions.RequestException:
-            msg = f"WLED {ip_address}: Failed to connect"
-            raise ValueError(msg)
+            if not response.ok:
+                msg = f"WLED {ip_address}: API Error - {response.status}"
+                raise ValueError(msg)
 
-        if not response.ok:
-            msg = f"WLED {ip_address}: API Error - {response.status_code}"
-            raise ValueError(msg)
+            if method == "GET":
+                return await response.json()
+            elif method == "POST":
+                return await response.status
 
-        return response
+            return await response.status
 
     @staticmethod
     async def _get_sync_settings(ip_address):
 
-        response = await WLED._wled_request(
-            requests.get, ip_address, "json/cfg"
-        )
-        return response.json
+        response = await WLED._wled_request("GET", ip_address, "json/cfg")
+        return response
 
     async def flush_sync_settings(self):
         """
@@ -268,7 +270,7 @@ class WLED:
         if self.reboot_flag:
             self.sync_settings["rb"] = True
         await WLED._wled_request(
-            requests.post,
+            "POST",
             self.ip_address,
             "json/cfg",
             data=self.sync_settings,
@@ -288,10 +290,10 @@ class WLED:
             f"WLED {self.ip_address}: Attempting to contact device..."
         )
         response = await WLED._wled_request(
-            requests.get, self.ip_address, "json/info"
+            "GET", self.ip_address, "json/info"
         )
 
-        wled_config = response.json()
+        wled_config = response
 
         if not wled_config["brand"] in "WLED":
             msg = f"WLED {self.ip_address}: Not a compatible WLED brand '{wled_config['brand']}'"
@@ -309,10 +311,10 @@ class WLED:
             state, dict. Full device state
         """
         response = await WLED._wled_request(
-            requests.get, self.ip_address, "json/state"
+            "GET", self.ip_address, "json/state"
         )
 
-        return response.json()
+        return response
 
     async def get_power_state(self):
         """
@@ -344,7 +346,7 @@ class WLED:
             state (bool): on/off
         """
         await WLED._wled_request(
-            requests.post, self.ip_address, f"win&T={'1' if state else '0'}"
+            "POST", self.ip_address, f"win&T={'1' if state else '0'}"
         )
 
         _LOGGER.info(
@@ -363,7 +365,7 @@ class WLED:
         brightness = max(0, max(int(brightness), 255))
 
         await WLED._wled_request(
-            requests.post, self.ip_address, f"win&A={brightness}"
+            "POST", self.ip_address, f"win&A={brightness}"
         )
 
         _LOGGER.info(
@@ -484,9 +486,7 @@ class WLED:
         """
         HTTP Post to reboot wled device
         """
-        await WLED._wled_request(
-            requests.post, self.ip_address, "win&RB", timeout=3
-        )
+        await WLED._wled_request("POST", self.ip_address, "win&RB", timeout=3)
 
 
 def empty_queue(queue: asyncio.Queue):

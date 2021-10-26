@@ -390,6 +390,7 @@ class Devices(RegistryLoader):
         """
         Creates a new device.
         """
+        _LOGGER.info("BEGIN Devices add_new_device method")
         # First, we try to make sure this device doesn't share a destination with any existing device
         if "ip_address" in device_config.keys():
             device_ip = device_config["ip_address"].rstrip(".")
@@ -424,6 +425,7 @@ class Devices(RegistryLoader):
 
         # If WLED device, get all the necessary config from the device itself
         if device_type == "wled":
+            _LOGGER.info("BEGIN Device wled device routine")
             wled = WLED(resolved_dest)
             wled_config = await wled.get_config()
 
@@ -561,12 +563,15 @@ class Devices(RegistryLoader):
 
 class WLEDListener(zeroconf.ServiceBrowser):
     def __init__(self, _ledfx):
+        _LOGGER.info("BEGIN WLEDListener __init__ method")
         self._ledfx = _ledfx
 
     def remove_service(self, zeroconf_obj, type, name):
+        _LOGGER.info("BEGIN WLEDListener remove_service method")
         _LOGGER.info(f"Service {name} removed")
 
     def add_service(self, zeroconf_obj, type, name):
+        _LOGGER.info("BEGIN WLEDListener add_service method")
         info = zeroconf_obj.get_service_info(type, name)
 
         if info:
