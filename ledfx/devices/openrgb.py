@@ -21,9 +21,10 @@ class OpenRGB(NetworkedDevice):
                     "name", description="Friendly name for the device"
                 ): str,
                 vol.Required(
-                    "openrgb_name",
+                    "openrgb_id",
                     description="Exact name of openRGB device (within openRGB).",
-                ): str,
+                    default=0,
+                ): vol.All(int, vol.Range(min=1)),
                 vol.Required(
                     "pixel_count",
                     description="Number of individual pixels",
@@ -41,15 +42,16 @@ class OpenRGB(NetworkedDevice):
         super().__init__(ledfx, config)
         self.ip_address = self._config["ip_address"]
         self.port = self._config["port"]
-        self.openrgb_device_name = self._config["openrgb_name"]
+        self.openrgb_device_id = self._config["openrgb_id"]
 
     def activate(self):
         try:
             from openrgb import OpenRGBClient
 
             self.openrgb_device = OpenRGBClient(
-                self.ip_address, self.port, "LedFx", 2  # protocol_version
-            ).get_devices_by_name(f"{self.openrgb_device_name}")[0]
+                self.ip_address, self.port, "LedFx", 3  # protocol_version
+            )
+            self.openrgb_device = self.openrgb_device.devices[self.openrgb_device_id]
             # check for eedevice
             device_supports_direct = False
             for mode in self.openrgb_device.modes:
@@ -62,12 +64,12 @@ class OpenRGB(NetworkedDevice):
             self.deactivate()
         except IndexError:
             _LOGGER.critical(
-                f"Couldn't find openRGB device named: {self.openrgb_device_name}"
+                f"Couldn't find openRGB device named: {self.openrgb_device_id}"
             )
             self.deactivate()
         except ValueError:
             _LOGGER.critical(
-                f"{self.openrgb_device_name} doesn't support direct mode, and isn't suitable for streamed effects from LedFx"
+                f"{self.openrgb_device_id} doesn't support direct mode, and isn't suitable for streamed effects from LedFx"
             )
             self.deactivate()
         else:
