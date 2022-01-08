@@ -22,9 +22,9 @@ class OpenRGB(NetworkedDevice):
                 ): str,
                 vol.Required(
                     "openrgb_id",
-                    description="Exact name of openRGB device (within openRGB).",
+                    description="ID of openRGB device (within openRGB).",
                     default=0,
-                ): vol.All(int, vol.Range(min=1)),
+                ): vol.All(int, vol.Range(min=0)),
                 vol.Required(
                     "pixel_count",
                     description="Number of individual pixels",
