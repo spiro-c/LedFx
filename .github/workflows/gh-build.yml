@@ -27,7 +27,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Get Backendver
+      - name: Get Backend Version
         id: getbackendver
         run: |       
           echo "action_state=$(python3 ledfx/consts.py)" >> $GITHUB_ENV
@@ -89,6 +89,7 @@ jobs:
           update: true
           install: |
               make
+              git
               zip
               unzip
               base-devel
