@@ -31,7 +31,7 @@ jobs:
         id: getbackendver
         run: |       
           echo "action_state=$(python3 ledfx/consts.py)" >> $GITHUB_ENV
-          BINARY_NAME=LedFx-$${{ runner.os }}
+          BINARY_NAME=LedFx-${{ runner.os }}
           echo "BINARY_NAME=$BINARY_NAME" >> $GITHUB_ENV
 
       - name: Get pip cache dir
@@ -92,17 +92,18 @@ jobs:
         if: startsWith(runner.os, 'Windows')
         run: |
             pyinstaller win-portable.spec
+            mv dist\LedFx.exe dist\$BINARY_NAME-$action_state.exe
 
       - name: Upload windows core
         if: startsWith(runner.os, 'Windows')
         uses: actions/upload-artifact@v3
         with:
             name: ${{ env.BINARY_NAME }}-core-${{ env.action_state }}
-            path: dist\LedFx
+            path: ${{ env.BINARY_NAME }}-core-${{ env.action_state }}.zip
 
       - name: Upload windows portable
         if: startsWith(runner.os, 'Windows')
         uses: actions/upload-artifact@v3
         with:
             name: ${{ env.BINARY_NAME }}-portable-${{ env.action_state }}
-            path: dist\LedFx.exe
+            path: dist\${{ env.BINARY_NAME }}-portable-${{ env.action_state }}.exe
