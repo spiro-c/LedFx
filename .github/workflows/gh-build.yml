@@ -80,7 +80,8 @@ jobs:
           python3 -m pip install -e .
           python3 setup.py develop
 
-      - name: Portaudio dependency for windows 
+      - name: Portaudio dependency for windows
+        if: startsWith(runner.os, 'Windows') 
         uses: msys2/setup-msys2@v2
         shell: msys2 {0}
         with:
@@ -96,6 +97,7 @@ jobs:
               mingw-w64-x86_64-cmake
 
       - name: Build portaudio
+        if: startsWith(runner.os, 'Windows')
         shell: msys2 {0}
         run: |
           export CYGPATH=$(cygpath -m /)
