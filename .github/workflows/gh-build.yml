@@ -23,15 +23,26 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Get pip cache dir
-        id: pip-cache
-        run: |
-          echo "dir=$(pip cache dir)" >> $GITHUB_OUTPUT
-
-      - name: pip cache
-        uses: actions/cache@v3
+      - uses: actions/cache@v3
+        if: startsWith(runner.os, 'Linux')
         with:
-          path: ${{ steps.pip-cache.outputs.dir }}
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - uses: actions/cache@v3
+        if: startsWith(runner.os, 'macOS')
+        with:
+          path: ~/Library/Caches/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - uses: actions/cache@v3
+        if: startsWith(runner.os, 'Windows')
+        with:
+          path: ~\AppData\Local\pip\Cache
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
           restore-keys: |
             ${{ runner.os }}-pip-
