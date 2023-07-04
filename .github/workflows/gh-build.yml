@@ -56,11 +56,13 @@ jobs:
 
       - name: Install dependencies
         run: |
-          python3 -m pip install -r requirements.txt pyinstaller pywin32
-   
+          python3 -m pip install -r requirements.txt pyinstaller
+
+
       - name: Build with pyinstaller
         if: startsWith(runner.os, 'Windows')
         run: |
+          python3 -m pip install pywin32
           python3 setup.py develop
           pyinstaller win.spec
 
