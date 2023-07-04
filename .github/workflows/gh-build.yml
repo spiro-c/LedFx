@@ -80,6 +80,31 @@ jobs:
           python3 -m pip install -e .
           python3 setup.py develop
 
+      - name: Portaudio dependency for windows 
+        uses: msys2/setup-msys2@v2
+        shell: msys2 {0}
+        with:
+          msystem: MINGW64
+          update: true
+          install: |
+              make
+              zip
+              unzip
+              base-devel
+              mingw-w64-x86_64-gcc
+              mingw-w64-x86_64-pkg-config
+              mingw-w64-x86_64-cmake
+
+      - name: Build portaudio
+        shell: msys2 {0}
+        run: |
+          export CYGPATH=$(cygpath -m /)
+          git clone https://github.com/portaudio/portaudio
+          cmake -B portaudio/.build -S portaudio -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX} -DCMAKE_BUILD_TYPE=Release -DPA_USE_ASIO=on
+          cmake --build portaudio/.build/
+          cmake --install portaudio/.build/
+          rm -rf portaudio
+          mv $CYGPATH/mingw64/bin/libportaudio.dll ${{ env.pythonLocation }}/lib/site-packages/_sounddevice_data/portaudio-binaries/libportaudio-64bit.dll
 
       - name: Build ${{ env.BINARY_NAME }} core ${{ env.action_state }}
         if: startsWith(runner.os, 'Windows')
@@ -92,7 +117,7 @@ jobs:
         if: startsWith(runner.os, 'Windows')
         uses: actions/upload-artifact@v3
         with:
-            name: ${{ env.BINARY_NAME }}-core-${{ env.action_state }}
+            name: ${{ env.BINARY_NAME }}-core-${{ env.action_state }}.zip
             path: ${{ env.BINARY_NAME }}-core-${{ env.action_state }}.zip
 
       - name: Build ${{ env.BINARY_NAME }} portable ${{ env.action_state }}
@@ -107,5 +132,5 @@ jobs:
         if: startsWith(runner.os, 'Windows')
         uses: actions/upload-artifact@v3
         with:
-            name: ${{ env.BINARY_NAME }}-portable-${{ env.action_state }}
+            name: ${{ env.BINARY_NAME }}-portable-${{ env.action_state }}.exe
             path: dist\${{ env.BINARY_NAME }}-portable-${{ env.action_state }}.exe
