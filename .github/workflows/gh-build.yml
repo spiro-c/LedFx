@@ -92,7 +92,8 @@ jobs:
         if: startsWith(runner.os, 'Windows')
         run: |
             pyinstaller win-portable.spec
-            mv dist\LedFx.exe dist\$BINARY_NAME-$action_state.exe
+            ls dist/
+            mv dist/LedFx.exe dist/$BINARY_NAME-$action_state.exe
 
       - name: Upload windows core
         if: startsWith(runner.os, 'Windows')
