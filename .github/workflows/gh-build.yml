@@ -30,7 +30,7 @@ jobs:
       - name: Get Backendver
         id: getbackendver
         run: |       
-          echo "action_state=$(ledfx/python3 consts.py)" >> $GITHUB_ENV
+          echo "action_state=$(python3 ledfx/consts.py)" >> $GITHUB_ENV
           BINARY_NAME=LedFx-$${{ runner.os }}
           echo "BINARY_NAME=$BINARY_NAME" >> $GITHUB_ENV
 
