@@ -88,14 +88,13 @@ jobs:
           msystem: MINGW64
           update: true
           install: |
-              make
               git
               zip
               unzip
               base-devel
               mingw-w64-x86_64-gcc
-              mingw-w64-x86_64-pkg-config
               mingw-w64-x86_64-cmake
+              mingw-w64-x86_64-ninja
 
       - name: Build portaudio
         if: startsWith(runner.os, 'Windows')
@@ -103,7 +102,7 @@ jobs:
         run: |
           export CYGPATH=$(cygpath -m /)
           git clone https://github.com/portaudio/portaudio
-          cmake -B portaudio/.build -S portaudio -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX} -DCMAKE_BUILD_TYPE=Release -DPA_USE_ASIO=on
+          cmake -B portaudio/.build -S portaudio -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX} -DPA_BUILD_SHARED_LIBS=on -DCMAKE_BUILD_TYPE=Release -DPA_USE_ASIO=on
           cmake --build portaudio/.build/
           cmake --install portaudio/.build/
           rm -rf portaudio
