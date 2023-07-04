@@ -21,10 +21,18 @@ jobs:
     steps:
       - name: Check out code from GitHub
         uses: actions/checkout@v3
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
+
+      - name: Get Backendver
+        id: getbackendver
+        run: |       
+          echo "action_state=$(ledfx/python3 consts.py)" >> $GITHUB_ENV
+          BINARY_NAME=LedFx-$${{ runner.os }}
+          echo "BINARY_NAME=$BINARY_NAME" >> $GITHUB_ENV
 
       - name: Get pip cache dir
         id: pip-cache
@@ -69,19 +77,32 @@ jobs:
       - name: Install dependencies
         run: |
           python3 -m pip install -r requirements.txt pyinstaller
-
-
-      - name: Build with pyinstaller
-        if: startsWith(runner.os, 'Windows')
-        run: |
           python3 -m pip install -e .
           python3 setup.py develop
-          pyinstaller win.spec
 
-      - name: Upload Artifact
+
+      - name: Build windwos core
+        if: startsWith(runner.os, 'Windows')
+        run: |
+          pyinstaller win.spec \
+          && \
+          7z.exe a -tzip $BINARY_NAME-$action_state.zip dist/LedFx "-mx5" "-xr!.git" "-xr!.github"
+
+      - name: Build windwos portable
+        if: startsWith(runner.os, 'Windows')
+        run: |
+            pyinstaller win-portable.spec
+
+      - name: Upload windows core
         if: startsWith(runner.os, 'Windows')
         uses: actions/upload-artifact@v3
         with:
-            name: LedFx-${{ runner.os }}
+            name: ${{ env.BINARY_NAME }}-core-${{ env.action_state }}
             path: dist\LedFx
 
+      - name: Upload windows portable
+        if: startsWith(runner.os, 'Windows')
+        uses: actions/upload-artifact@v3
+        with:
+            name: ${{ env.BINARY_NAME }}-portable-${{ env.action_state }}
+            path: dist\LedFx.exe
