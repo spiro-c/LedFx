@@ -27,6 +27,7 @@ jobs:
         id: pip-cache
         run: |
           echo "dir=$(pip cache dir)" >> $GITHUB_OUTPUT
+          echo "dir=$(pip cache dir)"
 
       - uses: actions/cache@v3
         if: startsWith(runner.os, 'Linux')
@@ -62,7 +63,14 @@ jobs:
       - name: Build with pyinstaller
         if: startsWith(runner.os, 'Windows')
         run: |
-          python3 -m pip install pywin32
+          python3 -m pip install -e .
           python3 setup.py develop
           pyinstaller win.spec
+
+      - name: Upload Artifact
+        if: startsWith(runner.os, 'Windows')
+        uses: actions/upload-artifact@v3
+        with:
+            name: LedFx-${{ runner.os }}
+            path: dist\LedFx
 
