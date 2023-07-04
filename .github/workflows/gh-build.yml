@@ -62,5 +62,5 @@ jobs:
       - name: Build with pyinstaller
         if: startsWith(runner.os, 'Windows')
         run: |
-          python3 -m pyinstaller win.spec
+          pyinstaller win.spec
 
