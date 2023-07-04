@@ -106,11 +106,12 @@ jobs:
           cmake --build portaudio/.build/
           cmake --install portaudio/.build/
           rm -rf portaudio
-          mv $CYGPATH/mingw64/bin/libportaudio.dll $pythonLocation/lib/site-packages/_sounddevice_data/portaudio-binaries/libportaudio-64bit.dll
+          mv $CYGPATH/mingw64/bin/libportaudio.dll $pythonLocation/lib/site-packages/_sounddevice_data/portaudio-binaries/libportaudio64bit.dll
 
       - name: Build ${{ env.BINARY_NAME }} core ${{ env.action_state }}
         if: startsWith(runner.os, 'Windows')
         run: |
+          mv tools/hook-samplerate.py $pythonLocation/lib/site-packages/_pyinstaller_hooks_contrib/hooks/stdhooks/hook-samplerate.py
           pyinstaller win.spec \
           && \
           7z.exe a -tzip $BINARY_NAME-core-$action_state.zip dist/LedFx "-mx5" "-xr!.git" "-xr!.github"
