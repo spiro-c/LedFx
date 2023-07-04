@@ -23,6 +23,11 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
+      - name: Get pip cache dir
+        id: pip-cache
+        run: |
+          echo "dir=$(pip cache dir)" >> $GITHUB_OUTPUT
+
       - uses: actions/cache@v3
         if: startsWith(runner.os, 'Linux')
         with:
@@ -48,6 +53,13 @@ jobs:
             ${{ runner.os }}-pip-
       - name: Display Python version
         run: python --version
+
       - name: Install dependencies
-        run: python3 -m pip install -r requirements.txt
+        run: python3 -m pip install -r requirements.txt pyinstaller
+
+      - name: Build with pyinstaller
+        if: startsWith(runner.os, 'Windows')
+        run: |
+          python3 setup.py develop
+          python3 -m pyinstaller win.spec
 
