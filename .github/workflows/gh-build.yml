@@ -55,11 +55,12 @@ jobs:
         run: python --version
 
       - name: Install dependencies
-        run: python3 -m pip install -r requirements.txt pyinstaller
+        run: |
+          python3 -m pip install -r requirements.txt pyinstaller
+          python3 setup.py develop
 
       - name: Build with pyinstaller
         if: startsWith(runner.os, 'Windows')
         run: |
-          python3 setup.py develop
           python3 -m pyinstaller win.spec
 
