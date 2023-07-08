@@ -1,6 +1,9 @@
 name: Github Build LedFx
 
 on: 
+  pull_request:
+    branches:
+    - patch-1
   workflow_dispatch:
     inputs:
       win-portable:
