@@ -1,0 +1,103 @@
+name: Github Build LedFx
+
+on: 
+  workflow_dispatch:
+    inputs:
+      win-portable:
+        description: 'Build Binary: win-portable'
+        default: true
+        type: boolean
+        required: false
+      win-zip:
+        description: 'Build Binary: win-zip'
+        default: true
+        type: boolean
+        required: false
+      win-setup:
+        description: 'Build Binary: win-setup'
+        default: true
+        type: boolean
+        required: false
+    #   osx-arm64-app:
+    #     description: 'Build Binary: osx-arm64-app'
+    #     default: 'true'
+    #     required: false
+    #   osx-arm64-zip:
+    #     description: 'Build Binary: osx-arm64-zip'
+    #     default: true
+    #     required: false
+    #   osx-arm64-dmg:
+    #     description: 'Build Binary: osx-arm64-dmg'
+    #     default: true
+    #     required: false
+      osx-x64-app:
+        description: 'Build Binary: osx-x64-app'
+        default: true
+        type: boolean
+        required: false
+      osx-x64-zip:
+        description: 'Build Binary: osx-x64-zip'
+        default: true
+        type: boolean
+        required: false
+      osx-x64-dmg:
+        description: 'Build Binary: osx-x64-dmg'
+        default: true
+        type: boolean
+        required: false
+    #   linux-arm64-snap:
+    #     description: 'Build Binary: linux-arm64-snap'
+    #     default: true
+    #     required: false
+    #   linux-arm64-zip:
+    #     description: 'Build Binary: linux-arm64-zip'
+    #     default: true
+    #     required: false
+    #   linux-arm64-deb:
+    #     description: 'Build Binary: linux-arm64-deb'
+    #     default: true
+    #     required: false
+      linux-x64-snap:
+        description: 'Build Binary: linux-x64-snap'
+        default: true
+        type: boolean
+        required: false
+      linux-x64-zip:
+        description: 'Build Binary: linux-x64-zip'
+        default: true
+        type: boolean
+        required: false
+      linux-x64-deb:
+        description: 'Build Binary: linux-x64-deb'
+        default: true
+        type: boolean
+        required: false
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash -x {0}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: ['3.11']
+    steps:
+      - name: Check out code from GitHub
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'pipenv'
+      - name: Install pipenv
+        run: curl https://raw.githubusercontent.com/pypa/pipenv/master/get-pipenv.py | python
+
+      - name: Get Backend Version
+        id: getbackendver
+        run: |       
+          echo "action_state=$(python3 ledfx/consts.py)" >> $GITHUB_ENV
+          BINARY_NAME=LedFx-${{ runner.os }}
+          echo "BINARY_NAME=$BINARY_NAME" >> $GITHUB_ENV
