@@ -77,3 +77,18 @@ jobs:
     steps:
       - name: Check out code from GitHub
         uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'pipenv'
+      - name: Install pipenv
+        run: curl https://raw.githubusercontent.com/pypa/pipenv/master/get-pipenv.py | python
+
+      - name: Get Backend Version
+        id: getbackendver
+        run: |       
+          echo "action_state=$(python3 ledfx/consts.py)" >> $GITHUB_ENV
+          BINARY_NAME=LedFx-${{ runner.os }}
+          echo "BINARY_NAME=$BINARY_NAME" >> $GITHUB_ENV
