@@ -7,7 +7,14 @@ on:
   pull_request:
     branches:
       - patch-1
-
+  workflow_dispatch:
+    inputs:
+      use-emoji:
+        type: boolean
+        description: Include  emojis
+      win-portable:
+        type: boolean
+        description: 'Build Binary: win-portable'
 jobs:
   build:
     runs-on: ${{ matrix.os }}
