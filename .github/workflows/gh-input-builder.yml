@@ -10,7 +10,7 @@ on:
         description: 'Build Binary: win-portable'
         default: true
         type: boolean
-        required: false
+        required: true
       win-zip:
         description: 'Build Binary: win-zip'
         default: true
