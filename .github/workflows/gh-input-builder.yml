@@ -14,8 +14,8 @@ on:
       win-zip:
         description: 'Build Binary: win-zip'
         default: true
-        type: boolean
         required: false
+        type: boolean
       win-setup:
         description: 'Build Binary: win-setup'
         default: true
