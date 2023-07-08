@@ -1,12 +1,10 @@
 name: Github Build LedFx
 
 on:
-  # push:
-  #   branches:
-  #     - patch-1
-  # pull_request:
-  #   branches:
-  #     - patch-1
+  push:
+    branches:
+      - patch-1
+
   workflow_dispatch:
     inputs:
       use-emoji:
