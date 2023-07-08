@@ -15,18 +15,18 @@ on:
         description: 'Build Binary: win-setup'
         default: true
         required: false
-      osx-arm64-app:
-        description: 'Build Binary: osx-arm64-app'
-        default: 'true'
-        required: false
-      osx-arm64-zip:
-        description: 'Build Binary: osx-arm64-zip'
-        default: true
-        required: false
-      osx-arm64-dmg:
-        description: 'Build Binary: osx-arm64-dmg'
-        default: true
-        required: false
+    #   osx-arm64-app:
+    #     description: 'Build Binary: osx-arm64-app'
+    #     default: 'true'
+    #     required: false
+    #   osx-arm64-zip:
+    #     description: 'Build Binary: osx-arm64-zip'
+    #     default: true
+    #     required: false
+    #   osx-arm64-dmg:
+    #     description: 'Build Binary: osx-arm64-dmg'
+    #     default: true
+    #     required: false
       osx-x64-app:
         description: 'Build Binary: osx-x64-app'
         default: true
@@ -39,18 +39,18 @@ on:
         description: 'Build Binary: osx-x64-dmg'
         default: true
         required: false
-      linux-arm64-snap:
-        description: 'Build Binary: linux-arm64-snap'
-        default: true
-        required: false
-      linux-arm64-zip:
-        description: 'Build Binary: linux-arm64-zip'
-        default: true
-        required: false
-      linux-arm64-deb:
-        description: 'Build Binary: linux-arm64-deb'
-        default: true
-        required: false
+    #   linux-arm64-snap:
+    #     description: 'Build Binary: linux-arm64-snap'
+    #     default: true
+    #     required: false
+    #   linux-arm64-zip:
+    #     description: 'Build Binary: linux-arm64-zip'
+    #     default: true
+    #     required: false
+    #   linux-arm64-deb:
+    #     description: 'Build Binary: linux-arm64-deb'
+    #     default: true
+    #     required: false
       linux-x64-snap:
         description: 'Build Binary: linux-x64-snap'
         default: true
