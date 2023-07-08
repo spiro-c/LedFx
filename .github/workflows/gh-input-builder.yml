@@ -6,14 +6,17 @@ on:
       win-portable:
         description: 'Build Binary: win-portable'
         default: true
+        type: boolean
         required: false
       win-zip:
         description: 'Build Binary: win-zip'
         default: true
+        type: boolean
         required: false
       win-setup:
         description: 'Build Binary: win-setup'
         default: true
+        type: boolean
         required: false
     #   osx-arm64-app:
     #     description: 'Build Binary: osx-arm64-app'
@@ -30,14 +33,17 @@ on:
       osx-x64-app:
         description: 'Build Binary: osx-x64-app'
         default: true
+        type: boolean
         required: false
       osx-x64-zip:
         description: 'Build Binary: osx-x64-zip'
         default: true
+        type: boolean
         required: false
       osx-x64-dmg:
         description: 'Build Binary: osx-x64-dmg'
         default: true
+        type: boolean
         required: false
     #   linux-arm64-snap:
     #     description: 'Build Binary: linux-arm64-snap'
@@ -54,14 +60,17 @@ on:
       linux-x64-snap:
         description: 'Build Binary: linux-x64-snap'
         default: true
+        type: boolean
         required: false
       linux-x64-zip:
         description: 'Build Binary: linux-x64-zip'
         default: true
+        type: boolean
         required: false
       linux-x64-deb:
         description: 'Build Binary: linux-x64-deb'
         default: true
+        type: boolean
         required: false
 
 jobs:
