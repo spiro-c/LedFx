@@ -1,71 +1,12 @@
 name: Github Build LedFx
 
-on: 
+on:
+  push:
+    branches:
+      - patch-1
   pull_request:
     branches:
-    - patch-1
-  workflow_dispatch:
-    inputs:
-      win-portable:
-        description: 'Build Binary: win-portable'
-        default: true
-        type: boolean
-      win-zip:
-        description: 'Build Binary: win-zip'
-        default: true
-        type: boolean
-      win-setup:
-        description: 'Build Binary: win-setup'
-        default: true
-        type: boolean
-    #   osx-arm64-app:
-    #     description: 'Build Binary: osx-arm64-app'
-    #     default: 'true'
-    #     required: false
-    #   osx-arm64-zip:
-    #     description: 'Build Binary: osx-arm64-zip'
-    #     default: true
-    #     required: false
-    #   osx-arm64-dmg:
-    #     description: 'Build Binary: osx-arm64-dmg'
-    #     default: true
-    #     required: false
-      osx-x64-app:
-        description: 'Build Binary: osx-x64-app'
-        default: true
-        type: boolean
-      osx-x64-zip:
-        description: 'Build Binary: osx-x64-zip'
-        default: true
-        type: boolean
-      osx-x64-dmg:
-        description: 'Build Binary: osx-x64-dmg'
-        default: true
-        type: boolean
-    #   linux-arm64-snap:
-    #     description: 'Build Binary: linux-arm64-snap'
-    #     default: true
-    #     required: false
-    #   linux-arm64-zip:
-    #     description: 'Build Binary: linux-arm64-zip'
-    #     default: true
-    #     required: false
-    #   linux-arm64-deb:
-    #     description: 'Build Binary: linux-arm64-deb'
-    #     default: true
-    #     required: false
-      linux-x64-snap:
-        description: 'Build Binary: linux-x64-snap'
-        default: true
-        type: boolean
-      linux-x64-zip:
-        description: 'Build Binary: linux-x64-zip'
-        default: true
-        type: boolean
-      linux-x64-deb:
-        description: 'Build Binary: linux-x64-deb'
-        default: true
-        type: boolean
+      - patch-1
 
 jobs:
   build:
