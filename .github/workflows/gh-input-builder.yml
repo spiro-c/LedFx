@@ -25,33 +25,7 @@ on:
         type: environment
         required: true
 
-
-
 jobs:
-  build:
-    runs-on: ${{ matrix.os }}
-    defaults:
-      run:
-        shell: bash -x {0}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-        python-version: ['3.11']
-    steps:
-      - name: Check out code from GitHub
-        uses: actions/checkout@v3
-
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: ${{ matrix.python-version }}
-          cache: 'pip'
-      - name: Get Backend Version
-        id: getbackendver
-        run: |       
-          echo "action_state=$(python3 ledfx/consts.py)" >> $GITHUB_ENV
-          BINARY_NAME=LedFx-${{ runner.os }}
-          echo "BINARY_NAME=$BINARY_NAME" >> $GITHUB_ENV
   print-tag:
     runs-on: ubuntu-latest
     if:  ${{ inputs.print_tags }} 
