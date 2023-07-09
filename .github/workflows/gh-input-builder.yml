@@ -1,18 +1,32 @@
 name: Github Build LedFx
 
 on:
-  push:
-    branches:
-      - patch-1
-
   workflow_dispatch:
     inputs:
-      use-emoji:
+      logLevel:
+        description: 'Log level'
+        required: true
+        default: 'warning'
+        type: choice
+        options:
+          - info
+          - warning
+          - debug
+      print_tags:
+        description: 'True to print to STDOUT'
+        required: true
         type: boolean
-        description: Include  emojis
-      win-portable:
-        type: boolean
-        description: 'Build Binary: win-portable'
+      tags:
+        description: 'Test scenario tags'
+        required: true
+        type: string
+      environment:
+        description: 'Environment to run tests against'
+        type: environment
+        required: true
+
+
+
 jobs:
   build:
     runs-on: ${{ matrix.os }}
@@ -31,14 +45,16 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-          cache: 'pipenv'
-      - name: Install pipenv
-        run: curl https://raw.githubusercontent.com/pypa/pipenv/master/get-pipenv.py | python
-      - run: pipenv install
-
+          cache: 'pip'
       - name: Get Backend Version
         id: getbackendver
         run: |       
           echo "action_state=$(python3 ledfx/consts.py)" >> $GITHUB_ENV
           BINARY_NAME=LedFx-${{ runner.os }}
           echo "BINARY_NAME=$BINARY_NAME" >> $GITHUB_ENV
+  print-tag:
+    runs-on: ubuntu-latest
+    if:  ${{ inputs.print_tags }} 
+    steps:
+      - name: Print the input tag to STDOUT
+        run: echo  The tags are ${{ inputs.tags }} 
