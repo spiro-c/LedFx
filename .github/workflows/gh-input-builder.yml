@@ -1,4 +1,8 @@
 on:
+  push:
+    # Sequence of patterns matched against refs/heads
+    branches:    
+      - patch-1
   workflow_dispatch:
     inputs:
       logLevel:
