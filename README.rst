@@ -4,7 +4,7 @@
 |Build Status| |License| |Build Status Docs| |Discord|
 |Contributor Covenant|
 
-.. image:: https://raw.githubusercontent.com/LedFx/LedFx/b8e68beaa215d4308c74d0c7d657556ac894b707/icons/banner.png
+.. image:: https://raw.githubusercontent.com/LedFx/LedFx/main/icons/banner.png
 
 LedFx website: https://ledfx.app/
 
@@ -51,7 +51,7 @@ Documentation built against this repository can be found here: `Latest documenta
 
 The below image describes a basic setup - LedFx running on PC, communicating with a WLED Device controlling an LED strip.
 
-.. image:: https://i.imgur.com/vzyHNwG.png
+.. image:: https://raw.githubusercontent.com/LedFx/LedFx/main/docs/_static/topology.png
 
 .. list-table::
    :widths: 75 75
