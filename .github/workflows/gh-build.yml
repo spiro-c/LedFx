@@ -16,14 +16,14 @@ jobs:
         shell: bash -x {0}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-        python-version: ['3.11']
+        os: [windows-latest]
+        python-version: ['3.12.x']
     steps:
       - name: Check out code from GitHub
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -34,51 +34,52 @@ jobs:
           BINARY_NAME=LedFx-${{ runner.os }}
           echo "BINARY_NAME=$BINARY_NAME" >> $GITHUB_ENV
 
-      - name: Get pip cache dir
-        id: pip-cache
-        run: |
-          echo "dir=$(pip cache dir)" >> $GITHUB_OUTPUT
-          echo "dir=$(pip cache dir)"
+      - name: Get full Python version
+        id: full-python-version
+        run: echo version=$(python -c "import sys; print('-'.join(str(v) for v in sys.version_info))") >> $GITHUB_OUTPUT
 
-      - name: pip cache
+      - name: Install poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python - -y
+
+      - name: Update Path for Windows
+        run: echo "$APPDATA\Python\Scripts" >> $GITHUB_PATH
+
+      - name: Enable long paths for git on Windows
+
+        # Enable handling long path names (+260 char) on the Windows platform
+        # https://docs.microsoft.com/en-us/windows/win32/fileio/naming-a-file#maximum-path-length-limitation
+        run: git config --system core.longpaths true
+
+      - name: Configure poetry
+        run: poetry config virtualenvs.in-project true
+
+      - name: Set up cache
         uses: actions/cache@v3
+        id: cache
         with:
-          path: ${{ steps.pip-cache.outputs.dir }}
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
+          path: .venv
+          key: venv-${{ runner.os }}-${{ steps.full-python-version.outputs.version }}-${{ hashFiles('**/poetry.lock') }}
 
-      # - uses: actions/cache@v3
-      #   if: startsWith(runner.os, 'Linux')
-      #   with:
-      #     path: ~/.cache/pip
-      #     key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-      #     restore-keys: |
-      #       ${{ runner.os }}-pip-
-
-      # - uses: actions/cache@v3
-      #   if: startsWith(runner.os, 'macOS')
-      #   with:
-      #     path: ~/Library/Caches/pip
-      #     key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-      #     restore-keys: |
-      #       ${{ runner.os }}-pip-
-
-      # - uses: actions/cache@v3
-      #   if: startsWith(runner.os, 'Windows')
-      #   with:
-      #     path: ~\AppData\Local\pip\Cache
-      #     key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-      #     restore-keys: |
-      #       ${{ runner.os }}-pip-
-      - name: Display Python version
-        run: python --version
-
-      - name: Install dependencies
+      - name: Ensure cache is healthy
+        if: steps.cache.outputs.cache-hit == 'true'
         run: |
-          python3 -m pip install -r requirements.txt pyinstaller
-          python3 -m pip install -e .
-          python3 setup.py develop
+          # `timeout` is not available on macOS, so we define a custom function.
+          [ "$(command -v timeout)" ] || function timeout() { perl -e 'alarm shift; exec @ARGV' "$@"; }
+
+          # Using `timeout` is a safeguard against the Poetry command hanging for some reason.
+          timeout 10s poetry run pip --version || rm -rf .venv
+
+      - name: Check lock file
+        run: poetry check --lock
+
+      - name: Build a binary wheel
+        run: |
+          poetry build
+
+      - name: Install LedFx
+        run: |
+          poetry install
 
       - name: Portaudio dependency for windows
         if: startsWith(runner.os, 'Windows') 
@@ -108,32 +109,32 @@ jobs:
           rm -rf portaudio
           mv $CYGPATH/mingw64/bin/libportaudio.dll $pythonLocation/lib/site-packages/_sounddevice_data/portaudio-binaries/libportaudio64bit.dll
 
-      - name: Build ${{ env.BINARY_NAME }} core ${{ env.action_state }}
-        if: startsWith(runner.os, 'Windows')
-        run: |
-          mv tools/hook-samplerate.py $pythonLocation/lib/site-packages/_pyinstaller_hooks_contrib/hooks/stdhooks/hook-samplerate.py
-          pyinstaller win.spec \
-          && \
-          7z.exe a -tzip $BINARY_NAME-core-$action_state.zip dist/LedFx "-mx5" "-xr!.git" "-xr!.github"
+      # - name: Build ${{ env.BINARY_NAME }} core ${{ env.action_state }}
+      #   if: startsWith(runner.os, 'Windows')
+      #   run: |
+      #     mv tools/hook-samplerate.py $pythonLocation/lib/site-packages/_pyinstaller_hooks_contrib/hooks/stdhooks/hook-samplerate.py
+      #     pyinstaller win.spec \
+      #     && \
+      #     7z.exe a -tzip $BINARY_NAME-core-$action_state.zip dist/LedFx "-mx5" "-xr!.git" "-xr!.github"
 
-      - name: Upload ${{ env.BINARY_NAME }} core ${{ env.action_state }}
-        if: startsWith(runner.os, 'Windows')
-        uses: actions/upload-artifact@v3
-        with:
-            name: ${{ env.BINARY_NAME }}-core-${{ env.action_state }}.zip
-            path: ${{ env.BINARY_NAME }}-core-${{ env.action_state }}.zip
+      # - name: Upload ${{ env.BINARY_NAME }} core ${{ env.action_state }}
+      #   if: startsWith(runner.os, 'Windows')
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #       name: ${{ env.BINARY_NAME }}-core-${{ env.action_state }}.zip
+      #       path: ${{ env.BINARY_NAME }}-core-${{ env.action_state }}.zip
 
-      - name: Build ${{ env.BINARY_NAME }} portable ${{ env.action_state }}
-        if: startsWith(runner.os, 'Windows')
-        run: |
-            pyinstaller win-portable.spec
-            ls dist/
-            mv dist/LedFx.exe dist/$BINARY_NAME-portable-$action_state.exe
+      # - name: Build ${{ env.BINARY_NAME }} portable ${{ env.action_state }}
+      #   if: startsWith(runner.os, 'Windows')
+      #   run: |
+      #       pyinstaller win-portable.spec
+      #       ls dist/
+      #       mv dist/LedFx.exe dist/$BINARY_NAME-portable-$action_state.exe
 
 
-      - name: Upload ${{ env.BINARY_NAME }} portable ${{ env.action_state }}
-        if: startsWith(runner.os, 'Windows')
-        uses: actions/upload-artifact@v3
-        with:
-            name: ${{ env.BINARY_NAME }}-portable-${{ env.action_state }}.exe
-            path: dist\${{ env.BINARY_NAME }}-portable-${{ env.action_state }}.exe
+      # - name: Upload ${{ env.BINARY_NAME }} portable ${{ env.action_state }}
+      #   if: startsWith(runner.os, 'Windows')
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #       name: ${{ env.BINARY_NAME }}-portable-${{ env.action_state }}.exe
+      #       path: dist\${{ env.BINARY_NAME }}-portable-${{ env.action_state }}.exe
