@@ -80,7 +80,7 @@ jobs:
       - name: Install LedFx
         run: |
           poetry install
-          pip install pyinstaller
+          poetry run pip install pyinstaller
           pip install pyinstaller
           poetry env info
 
