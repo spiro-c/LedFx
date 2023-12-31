@@ -79,9 +79,11 @@ jobs:
 
       - name: Install LedFx
         run: |
+          poetry shell
           poetry install
           pip install pyinstaller
           pip install pyinstaller
+          echo $POETRY_HOME
 
       - name: Portaudio dependency for windows
         if: startsWith(runner.os, 'Windows') 
