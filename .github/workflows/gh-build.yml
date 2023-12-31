@@ -93,7 +93,7 @@ jobs:
       - name: Get Backend Version
         id: getbackendver
         run: |       
-          echo "action_state=$(poetry run ledfx --version | cut -d- -f1 | cut -d. -f1,2)" >> $GITHUB_ENV
+          echo "action_state=$(poetry run ledfx --version | cut -d' ' -f2)" >> $GITHUB_ENV
           BINARY_NAME=LedFx-${{ runner.os }}
           echo "BINARY_NAME=$BINARY_NAME" >> $GITHUB_ENV
 
