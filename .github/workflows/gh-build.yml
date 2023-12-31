@@ -93,9 +93,10 @@ jobs:
       - name: Get Backend Version
         id: getbackendver
         run: |       
-          echo "action_state=$(poetry run ledfx --version)" >> $GITHUB_ENV
+          echo "action_state=$(poetry run ledfx --version | cut -d- -f1 | cut -d. -f1,2)" >> $GITHUB_ENV
           BINARY_NAME=LedFx-${{ runner.os }}
           echo "BINARY_NAME=$BINARY_NAME" >> $GITHUB_ENV
+
       - name: Portaudio dependency for windows
         if: startsWith(runner.os, 'Windows') 
         uses: msys2/setup-msys2@v2
