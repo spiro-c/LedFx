@@ -129,9 +129,9 @@ jobs:
         if: startsWith(runner.os, 'Windows')
         run: |
           mv tools/hook-samplerate.py $pythonLocation/lib/site-packages/_pyinstaller_hooks_contrib/hooks/stdhooks/hook-samplerate.py
-          pyinstaller win.spec \
-          && \
-          7z.exe a -tzip $BINARY_NAME-core-$action_state.zip dist/LedFx "-mx5" "-xr!.git" "-xr!.github"
+          pyinstaller win.spec
+          mv -r dist/LedFx $BINARY_NAME-core-$action_state
+          7z.exe a -tzip $BINARY_NAME-core-$action_state.zip $BINARY_NAME-core-$action_state "-mx5" "-xr!.git" "-xr!.github"
 
       - name: Upload ${{ env.BINARY_NAME }} core ${{ env.action_state }}
         if: startsWith(runner.os, 'Windows')
