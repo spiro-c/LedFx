@@ -7,10 +7,10 @@ jobs:
 
   build-ledfx-osx:
     name: Build LedFx (OS X) (Apple Silicon)
-    runs-on: flyci-macos-large-latest-m1
+    runs-on: macos-latest-large
     strategy:
       matrix:
-        python: [3.10.x,3.11.x,3.12.x]
+        python: [3.12.x]
     steps:
       - name: Check out code from GitHub
         uses: actions/checkout@v4
@@ -21,7 +21,7 @@ jobs:
           brew install libsamplerate
       - name: Setup mbedtls path
         run: |
-          echo 'export PATH="/opt/homebrew/opt/mbedtls@2/bin:$PATH"' >> /Users/runner/.bash_profile
+          echo "/opt/homebrew/opt/mbedtls@2/bin" >> $GITHUB_PATH
       - name: Setup Python ${{ matrix.python }}
         id: python
         uses: actions/setup-python@v5
@@ -40,9 +40,5 @@ jobs:
           poetry install
       - name: Smoketest LedFx
         run: |
-          source $(poetry env info -p)/bin/activate
-          ledfx --ci-smoke-test
-          if [ $? -ne 0 ]; then
-            echo "LedFx launch failed: $?"
-            exit 1
-          fi
+          poetry run ledfx -vv --ci-smoke-test
+
