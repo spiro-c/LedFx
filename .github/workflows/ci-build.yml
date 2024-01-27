@@ -13,6 +13,9 @@ jobs:
   build-ledfx-linux:
     name: Build LedFx (Ubuntu)
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -x {0}
     strategy:
       matrix:
         python: [3.9.x,3.10.x,3.11.x,3.12.x]
@@ -27,9 +30,10 @@ jobs:
           gcc libatlas3-base portaudio19-dev libsamplerate-dev
       - name: Setup CI sound system
         uses: LABSN/sound-ci-helpers@v1
-      # - name: Create Audio Input
-      #   run: |
-      #    pactl load-module module-null-sink sink_name=LedFx_Test_Source sink_properties=device.description=LedFx_Test_Source
+      - name: Create Audio Input
+        run: |
+         pactl load-module module-null-sink sink_name=LedFx_Test_Source sink_properties=device.description=LedFx_Test_Source
+
       - name: Setup Python ${{ matrix.python }}
         id: python
         uses: actions/setup-python@v5
@@ -79,6 +83,10 @@ jobs:
       - name: Smoketest LedFx
         run: |
           poetry run ledfx --ci-smoke-test -c debug_config
+      - name: Run test Soundddevice
+        run: |
+          poetry run python -m sounddevice
+          python -m sounddevice
       - name: Run Tests
         run: |
           poetry run python -m sounddevice
