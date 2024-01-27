@@ -86,7 +86,6 @@ jobs:
       - name: Run test Soundddevice
         run: |
           poetry run python -m sounddevice
-          python -m sounddevice
       - name: Run Tests
         run: |
           poetry run python -m sounddevice
