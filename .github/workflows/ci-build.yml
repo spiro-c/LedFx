@@ -28,11 +28,6 @@ jobs:
         run: |
           sudo apt-get update && sudo apt-get install -y \
           gcc libatlas3-base portaudio19-dev libsamplerate-dev
-      - name: Setup CI sound system
-        uses: LABSN/sound-ci-helpers@v1
-      - name: Create Audio Input
-        run: |
-         pactl load-module module-null-sink sink_name=LedFx_Test_Source sink_properties=device.description=LedFx_Test_Source
 
       - name: Setup Python ${{ matrix.python }}
         id: python
@@ -83,6 +78,11 @@ jobs:
       - name: Smoketest LedFx
         run: |
           poetry run ledfx --ci-smoke-test -c debug_config
+      - name: Setup CI sound system
+        uses: LABSN/sound-ci-helpers@v1
+      - name: Create Audio Input
+        run: |
+         pactl load-module module-null-sink sink_name=LedFx_Test_Source sink_properties=device.description=LedFx_Test_Source
       - name: Run test Soundddevice
         run: |
           poetry run python -m sounddevice
